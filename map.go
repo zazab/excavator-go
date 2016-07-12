@@ -1,4 +1,4 @@
-package extractor
+package excavator
 
 import (
 	"reflect"
@@ -6,12 +6,13 @@ import (
 	"github.com/seletskiy/hierr"
 )
 
-func extractMap(receiverValue, dataValue reflect.Value) error {
+func excavateMap(receiverValue, dataValue reflect.Value) error {
 	dataKind := unrollType(dataValue.Type()).Kind()
 	if dataKind != reflect.Map {
 		return newConvertError(receiverValue, dataValue)
 	}
 
+func excavateMapFromMap(receiverValue, dataValue reflect.Value) error {
 	mapType := receiverValue.Type()
 	mapElemType := mapType.Elem()
 
@@ -20,10 +21,10 @@ func extractMap(receiverValue, dataValue reflect.Value) error {
 		dataMapElem := unrollValue(dataValue.MapIndex(key))
 		mapElem := reflect.New(mapElemType).Elem()
 
-		err := extract(mapElem, dataMapElem)
+		err := excavate(mapElem, dataMapElem)
 		if err != nil {
 			return hierr.Errorf(
-				err, "can't extract element '%v'", key,
+				err, "can't excavate element '%v'", key,
 			)
 		}
 

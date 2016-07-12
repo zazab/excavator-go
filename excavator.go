@@ -1,4 +1,4 @@
-package extractor
+package excavator
 
 import (
 	"errors"
@@ -27,7 +27,7 @@ func (err *convertError) Error() string {
 	)
 }
 
-func Extract(receiver, data interface{}) error {
+func Excavate(receiver, data interface{}) error {
 	receiverType := reflect.TypeOf(receiver)
 	if receiverType.Kind() != reflect.Ptr {
 		log.Printf("receiver: %#+v", receiver)
@@ -42,10 +42,10 @@ func Extract(receiver, data interface{}) error {
 		dataValue     = unrollValue(reflect.ValueOf(data))
 	)
 
-	return extract(receiverValue, unrollValue(dataValue))
+	return excavate(receiverValue, unrollValue(dataValue))
 }
 
-func extract(receiver, data reflect.Value) error {
+func excavate(receiver, data reflect.Value) error {
 	var (
 		receiverKind = receiver.Type().Kind()
 		dataKind     = data.Type().Kind()
@@ -54,13 +54,13 @@ func extract(receiver, data reflect.Value) error {
 	switch receiverKind {
 	case reflect.Struct:
 		log.Println("exporting struct")
-		return extractStruct(receiver, data)
+		return excavateStruct(receiver, data)
 	case reflect.Slice:
 		log.Println("exporting slice")
-		return extractSlice(receiver, data)
+		return excavateSlice(receiver, data)
 	case reflect.Map:
 		log.Println("exporting map")
-		return extractMap(receiver, data)
+		return excavateMap(receiver, data)
 	default:
 		log.Printf("exporting plain type %s", receiver.Type())
 		if receiverKind != dataKind {

@@ -1,4 +1,4 @@
-package extractor
+package excavator
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 	"reflect"
 )
 
-func extractSlice(receiverValue, dataValue reflect.Value) error {
+func excavateSlice(receiverValue, dataValue reflect.Value) error {
 	dataKind := unrollType(dataValue.Type()).Kind()
 	if dataKind != reflect.Slice {
 		log.Println("e1")
@@ -22,7 +22,7 @@ func extractSlice(receiverValue, dataValue reflect.Value) error {
 		sliceElem := unrollValue(dataValue.Index(index))
 
 		newSliceElem := newSlice.Index(index)
-		err := extract(newSliceElem, sliceElem)
+		err := excavate(newSliceElem, sliceElem)
 		if err != nil {
 			return fmt.Errorf("can't set element #%d: %s", index, err)
 		}

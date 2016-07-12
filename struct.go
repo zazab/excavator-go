@@ -1,4 +1,4 @@
-package extractor
+package excavator
 
 import (
 	"errors"
@@ -9,10 +9,10 @@ import (
 	"github.com/seletskiy/hierr"
 )
 
-func extractStruct(receiverValue, dataValue reflect.Value) error {
+func excavateStruct(receiverValue, dataValue reflect.Value) error {
 	switch dataValue.Type().Kind() {
 	case reflect.Map:
-		return exportMapToStruct(receiverValue, dataValue)
+		return excavateMapToStruct(receiverValue, dataValue)
 	case reflect.Struct:
 		// @TODO convert struct to struct
 		return errors.New("not implemented")
@@ -22,7 +22,7 @@ func extractStruct(receiverValue, dataValue reflect.Value) error {
 
 }
 
-func exportMapToStruct(receiverValue, dataValue reflect.Value) error {
+func excavateMapToStruct(receiverValue, dataValue reflect.Value) error {
 	var (
 		structType   = receiverValue.Type()
 		fieldsNumber = structType.NumField()
@@ -54,9 +54,9 @@ func exportMapToStruct(receiverValue, dataValue reflect.Value) error {
 		}
 
 		newFieldValue := reflect.New(field.Type).Elem()
-		err := extract(newFieldValue, unrollValue(fieldValue))
+		err := excavate(newFieldValue, unrollValue(fieldValue))
 		if err != nil {
-			return hierr.Errorf(err, "can't extract field '%s'", field.Name)
+			return hierr.Errorf(err, "can't excavate field '%s'", field.Name)
 		}
 
 		receiverValue.Field(index).Set(newFieldValue)

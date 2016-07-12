@@ -1,4 +1,4 @@
-package extractor_test
+package excavator_test
 
 import "log"
 
@@ -29,7 +29,7 @@ func main() {
 		receiver S2
 	)
 
-	err := extractor.Extract(&receiver, data)
+	err := excavator.Excavate(&receiver, data)
 	if err != nil {
 		log.Fatalf("can't export: %s", err)
 	}
