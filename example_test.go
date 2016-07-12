@@ -1,6 +1,10 @@
 package excavator_test
 
-import "log"
+import (
+	"log"
+
+	"github.com/zazab/excavator-go"
+)
 
 type S struct {
 	Field1 int      `zhash:"a"`
