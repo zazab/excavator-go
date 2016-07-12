@@ -9,6 +9,17 @@ const (
 	structTag = "zhash"
 )
 
+func getFieldKey(
+	field reflect.StructField,
+) reflect.Value {
+	tag := field.Tag.Get(structTag)
+	if tag != "" {
+		return reflect.ValueOf(tag)
+	}
+
+	return reflect.ValueOf(strings.ToLower(field.Name))
+}
+
 func getFieldFromMap(
 	field reflect.StructField,
 	dataValue reflect.Value,
