@@ -9,10 +9,10 @@ import (
 	"github.com/seletskiy/hierr"
 )
 
-func excavateStruct(receiverValue, dataValue reflect.Value) error {
+func excavateStruct(receiverValue, dataValue reflect.Value, tag string) error {
 	switch dataValue.Type().Kind() {
 	case reflect.Map:
-		return excavateMapToStruct(receiverValue, dataValue)
+		return excavateMapToStruct(receiverValue, dataValue, tag)
 	case reflect.Struct:
 		// @TODO convert struct to struct
 		return errors.New("not implemented")
@@ -22,15 +22,15 @@ func excavateStruct(receiverValue, dataValue reflect.Value) error {
 
 }
 
-func excavateMapToStruct(receiverValue, dataValue reflect.Value) error {
+func excavateMapToStruct(
+	receiverValue, dataValue reflect.Value, tag string,
+) error {
 	var (
 		structType   = receiverValue.Type()
 		fieldsNumber = structType.NumField()
 
 		zero reflect.Value
 	)
-
-	//mapElemType := dataType.Elem()
 
 	if dataValue.Type().Key().Kind() != reflect.String {
 		return fmt.Errorf(
@@ -47,14 +47,14 @@ func excavateMapToStruct(receiverValue, dataValue reflect.Value) error {
 			continue // skip anonimous fields
 		}
 
-		fieldValue := getFieldFromMap(field, dataValue)
+		fieldValue := getFieldFromMap(field, dataValue, tag)
 		if fieldValue == zero {
 			log.Printf("'%s' not found", field.Name)
 			continue
 		}
 
 		newFieldValue := reflect.New(field.Type).Elem()
-		err := excavate(newFieldValue, unrollValue(fieldValue))
+		err := excavate(newFieldValue, unrollValue(fieldValue), tag)
 		if err != nil {
 			return hierr.Errorf(err, "can't excavate field '%s'", field.Name)
 		}

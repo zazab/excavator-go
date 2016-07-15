@@ -6,15 +6,16 @@ import (
 )
 
 const (
-	structTag = "zhash"
+	// this tag is used, if nothing passed to Excavate function
+	DefaultStructTag = "excavator"
 )
 
 func getFieldKey(
-	field reflect.StructField,
+	field reflect.StructField, tag string,
 ) reflect.Value {
-	tag := field.Tag.Get(structTag)
-	if tag != "" {
-		return reflect.ValueOf(tag)
+	tagName := field.Tag.Get(tag)
+	if tagName != "" {
+		return reflect.ValueOf(tagName)
 	}
 
 	return reflect.ValueOf(strings.ToLower(field.Name))
@@ -23,10 +24,11 @@ func getFieldKey(
 func getFieldFromMap(
 	field reflect.StructField,
 	dataValue reflect.Value,
+	tag string,
 ) reflect.Value {
-	tag := field.Tag.Get(structTag)
-	if tag != "" {
-		return dataValue.MapIndex(reflect.ValueOf(tag))
+	tagName := field.Tag.Get(tag)
+	if tagName != "" {
+		return dataValue.MapIndex(reflect.ValueOf(tagName))
 	}
 
 	nameKey := reflect.ValueOf(field.Name)

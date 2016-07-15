@@ -27,7 +27,18 @@ func (err *convertError) Error() string {
 	)
 }
 
-func Excavate(receiver, data interface{}) error {
+// Excavate tries to convert data to receiver. If your struct already have some
+// tags (for example for marshaling form some format), then you can pass this
+// tag as structTag. If structTag not given, DefaultStructTag is used.
+func Excavate(receiver, data interface{}, structTag ...string) error {
+	tag := DefaultStructTag
+	if len(structTag) > 1 {
+		return errors.New("more than one tag field given")
+	}
+	if len(structTag) == 1 {
+		tag = structTag[0]
+	}
+
 	receiverType := reflect.TypeOf(receiver)
 	if receiverType.Kind() != reflect.Ptr {
 		log.Printf("receiver: %#+v", receiver)
@@ -42,10 +53,10 @@ func Excavate(receiver, data interface{}) error {
 		dataValue     = unrollValue(reflect.ValueOf(data))
 	)
 
-	return excavate(receiverValue, unrollValue(dataValue))
+	return excavate(receiverValue, unrollValue(dataValue), tag)
 }
 
-func excavate(receiver, data reflect.Value) error {
+func excavate(receiver, data reflect.Value, tag string) error {
 	var (
 		receiverKind = receiver.Type().Kind()
 		dataKind     = data.Type().Kind()
@@ -54,13 +65,13 @@ func excavate(receiver, data reflect.Value) error {
 	switch receiverKind {
 	case reflect.Struct:
 		log.Println("exporting struct")
-		return excavateStruct(receiver, data)
+		return excavateStruct(receiver, data, tag)
 	case reflect.Slice:
 		log.Println("exporting slice")
-		return excavateSlice(receiver, data)
+		return excavateSlice(receiver, data, tag)
 	case reflect.Map:
 		log.Println("exporting map")
-		return excavateMap(receiver, data)
+		return excavateMap(receiver, data, tag)
 	default:
 		log.Printf("exporting plain type %s", receiver.Type())
 		if receiverKind != dataKind {
