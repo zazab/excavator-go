@@ -50,6 +50,10 @@ func unrollType(value reflect.Type) reflect.Type {
 }
 
 func unrollValue(value reflect.Value) reflect.Value {
+	if value.CanAddr() && value.IsNil() {
+		return value
+	}
+
 	for value.Kind() == reflect.Interface || value.Kind() == reflect.Ptr {
 		value = value.Elem()
 	}
